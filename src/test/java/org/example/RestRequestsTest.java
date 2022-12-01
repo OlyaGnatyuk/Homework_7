@@ -1,5 +1,6 @@
 package org.example;
 
+import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -48,7 +49,7 @@ public class RestRequestsTest {
                                                     "}";
     private static final String JSON_TOKEN_PATH = "token";
     private static final String JSON_REASON_PATH = "reason";
-    private static final String BOOKINGID_PATH = "bookingid";
+    private static final String BOOKING_ID_PATH = "bookingid";
 
     @Test
     public void testGetToken() {
@@ -59,7 +60,7 @@ public class RestRequestsTest {
 
     @Test
     public void testCreateAndCheckBooking() {
-        String id = RestRequests.createBooking(BASE_URI, CREATE_BOOKING_BODY, 200, BOOKINGID_PATH);
+        String id = getBookingId(RestRequests.createBooking(BASE_URI, CREATE_BOOKING_BODY, 200));
         log.info("Бронирование создано: id = {}", id);
 
         log.info("Проверка бронирования с id = {}", id);
@@ -71,7 +72,7 @@ public class RestRequestsTest {
         String token = RestRequests.getToken(BASE_URI, GET_TOKEN_BODY, JSON_TOKEN_PATH);
 
         log.info("Создание бронирования:");
-        String id = RestRequests.createBooking(BASE_URI, CREATE_BOOKING_BODY, 200, BOOKINGID_PATH);
+        String id = getBookingId(RestRequests.createBooking(BASE_URI, CREATE_BOOKING_BODY, 200));
 
         log.info("Обновление бронирования с id = {}", id);
         RestRequests.updateBooking(BASE_URI, id, token, UPDATE_BOOKING_BODY);
@@ -85,7 +86,7 @@ public class RestRequestsTest {
         String token = RestRequests.getToken(BASE_URI, GET_TOKEN_BODY, JSON_TOKEN_PATH);
 
         log.info("Создание бронирования:");
-        String id = RestRequests.createBooking(BASE_URI, CREATE_BOOKING_BODY, 200, BOOKINGID_PATH);
+        String id = getBookingId(RestRequests.createBooking(BASE_URI, CREATE_BOOKING_BODY, 200));
 
         log.info("Удаление бронирования с id = {}", id);
         RestRequests.deleteBooking(BASE_URI, id, token, 201);
@@ -102,7 +103,8 @@ public class RestRequestsTest {
 
     @Test
     public void testCreateBookingWithWrongBody() {
-        RestRequests.createBooking(BASE_URI, CREATE_BOOKING_WRONG_BODY, 500, null);
+        RestRequests.createBooking(BASE_URI, CREATE_BOOKING_WRONG_BODY, 500);
+
         log.info("Создание бронирования(неверное тело)");
     }
 
@@ -119,5 +121,9 @@ public class RestRequestsTest {
         String wrongBookingId = "5000000";
         RestRequests.deleteBooking(BASE_URI, wrongBookingId, token, 405);
         log.info("Удаление бронирования с несуществующим id = {}", wrongBookingId);
+    }
+
+    private String getBookingId(Response response) {
+        return response.jsonPath().get(BOOKING_ID_PATH).toString();
     }
 }

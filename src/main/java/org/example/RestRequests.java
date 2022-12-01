@@ -20,8 +20,8 @@ public class RestRequests {
                 .path(path).toString();
     }
 
-    public static String createBooking(String baseUri, String body, int expectedStatusCode, String path) {
-        Response response = RestAssured.given()
+    public static Response createBooking(String baseUri, String body, int expectedStatusCode) {
+         return RestAssured.given()
                 .baseUri(baseUri)
                 .contentType(ContentType.JSON)
                 .body(body)
@@ -32,12 +32,6 @@ public class RestRequests {
                 .statusCode(expectedStatusCode)
                 .extract()
                 .response();
-
-        if (path != null) {
-            return response.path(path).toString();
-        }
-
-        return null;
     }
 
     public static String getBooking(String baseUri, String id, int expectedStatusCode) {
